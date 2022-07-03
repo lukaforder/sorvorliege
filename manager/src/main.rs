@@ -1,39 +1,22 @@
-use futures::{StreamExt, SinkExt};
-use futures_channel::mpsc::unbounded;
 use log::*;
 
 use rustls_pemfile::certs;
 use tokio_rustls::TlsAcceptor;
 use tokio_rustls::rustls::{ServerConfig, PrivateKey, Certificate};
-use tokio_rustls::rustls::server::NoClientAuth;
-use tokio_tungstenite::accept_async;
-use tungstenite::Message;
-
 use std::fs::File;
 use std::io::{self, BufReader};
 use std::sync::Arc;
 
-use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::{RwLock, Mutex};
+use tokio::net::{TcpListener};
 use tokio_tungstenite::tungstenite::Error;
-
-use tokio_rustls::server::TlsStream;
-
-use std::net::SocketAddr;
-
 use anyhow::Result;
 
-async fn handle_connection(peer: SocketAddr, stream: TlsStream<TcpStream>) -> tungstenite::Result<()> {
-  let ws_stream = accept_async(stream).await.expect("Failed to accept");
-	info!("New connection from {}", peer);
+mod commands;
+mod server;
+mod messaging;
+mod communicator;
 
-  // let (tx, rx) = unbounded();
-  let (mut outgoing, incoming) = ws_stream.split();
-
-  outgoing.send(Message::from("Hi")).await?;
-
-	Ok(())
-}
+extern crate strum;
 
 
 // FIXME: not hardcode cert/key paths
@@ -79,14 +62,13 @@ async fn main() -> io::Result<()> {
 		info!("Peer address: {}", peer);
 		if let Ok(stream) = acceptor.accept(stream).await {
 			tokio::spawn(async move {
-				if let Err(e) = handle_connection(peer, stream).await {
+				if let Err(e) = messaging::handle_connection(peer, stream).await {
 					match e {
 						Error::ConnectionClosed | Error::Protocol(_) | Error::Utf8 => (),
 						err => error!("Error processing connection: {:?}", err),
 					}
 				}
 			});
-			// accept_connection(peer, stream, state.clone()));
 		}
 	}
 	Ok(()) as io::Result<()>

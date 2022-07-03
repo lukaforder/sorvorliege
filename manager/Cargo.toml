@@ -9,8 +9,20 @@ edition = "2021"
 log = "0.4.17"
 env_logger = "0.9.0"
 
-anyhow = "1.0.58"
+base64 = "0.13.0"
+urlencoding = "2.1.0"
 
+chrono = "0.4.19"
+uuid = { version = "1.1.2", features = ["v4", "serde"] } # uuid's fit well in this context.
+
+async-trait = "0.1.56"
+anyhow = "1.0.58"
+thiserror = "1.0.31"
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+strum = "0.24.1"
+strum_macros = "0.24"
 
 tokio = { version = "1.19.2", features = ["full"] }
 
