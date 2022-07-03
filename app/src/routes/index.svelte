@@ -1,2 +1,10 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script>
+  import {wsStore} from "../stores/ws";
+
+  export const ws = wsStore("wss://localhost:18249", {
+    isConnected: false,
+    testVar: 0
+  }, []);
+</script>
+
+<p> {$ws} </p>
