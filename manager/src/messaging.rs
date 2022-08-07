@@ -21,10 +21,8 @@ macro_rules! send_command {
 pub fn encode_cmd(cmd: &commands::ServerCommands) -> Vec<u8> {
   Vec::from(
     base64::encode(
-      urlencoding::encode(
-        &serde_json::to_string(cmd).unwrap()
-      ).as_bytes()
-    )
+      &serde_json::to_string(cmd).unwrap()
+    ).as_bytes()
   )
 }
 
