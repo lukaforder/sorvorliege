@@ -6,12 +6,13 @@ use super::Result;
 
 #[derive(Serialize)]
 pub struct Test {
+  id: String,
 }
 
 impl Test {
   pub fn new() -> Self {
     Self {
-
+      id: uuid::Uuid::new_v4().to_string(),
     }
   }
 }
@@ -29,5 +30,8 @@ impl Communicator for Test {
   }
   fn name(&self) -> &'static str {
     "Test"
+  }
+  fn id(&self) -> String {
+    self.id.clone()
   }
 }

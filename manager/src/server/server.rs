@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::communicator::{CommunicatorType, BoxedCommunicator, self};
+use crate::{communicator::{CommunicatorType, BoxedCommunicator, self}, state::ID};
 
 use super::Message;
 
@@ -23,14 +23,14 @@ pub enum CommunicatorStatus {
 #[derive(Serialize, Deserialize)]
 #[derive(Clone)]
 pub struct ServerInfo {
-  pub id: Uuid,
+  pub id: ID,
   pub name: String,
   pub comm_status: CommunicatorStatus,
   pub comm_type: CommunicatorType,
 }
 
 pub struct Server {
-  id: Uuid,
+  id: ID,
   info: ServerInfo,
   communicator: Option<BoxedCommunicator>,
   messages: Vec<Message>,

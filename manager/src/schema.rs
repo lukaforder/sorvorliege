@@ -18,6 +18,10 @@ pub fn generate_schemas() -> std::io::Result<()> {
     }
   }
 
+  
+  let schema = schema_for!(super::state::User);
+  write_schema(&dir, "user", &schema)?;
+
   let schema = schema_for!(super::commands::ClientCommands);
   write_schema(&dir, "client_commands", &schema)?;
   

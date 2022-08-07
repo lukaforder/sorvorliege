@@ -16,6 +16,7 @@ mod server;
 mod messaging;
 mod communicator;
 mod schema;
+mod state;
 
 extern crate strum;
 
@@ -60,13 +61,16 @@ async fn main() -> io::Result<()> {
 
 	info!("Listening on: {}", addr);
 
+	let state = Arc::new(state::State::new());
+
 	while let Ok((stream, _)) = listener.accept().await {
 		let acceptor = acceptor.clone();
 		let peer = stream.peer_addr().expect("connected streams should have a peer address");
 		info!("Peer address: {}", peer);
+		let state = state.clone();
 		if let Ok(stream) = acceptor.accept(stream).await {
 			tokio::spawn(async move {
-				if let Err(e) = messaging::handle_connection(peer, stream).await {
+				if let Err(e) = messaging::handle_connection(peer, stream, state).await {
 					match e {
 						Error::ConnectionClosed | Error::Protocol(_) | Error::Utf8 => (),
 						err => error!("Error processing connection: {:?}", err),
