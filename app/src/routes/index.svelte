@@ -1,5 +1,5 @@
 <script>
-  import {wsStore} from "../stores/ws";
+  import {wsStore} from "../stores/ws/ws";
 
   export const ws = wsStore("wss://localhost:18249", {
     isConnected: false,

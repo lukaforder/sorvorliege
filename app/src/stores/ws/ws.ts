@@ -1,7 +1,8 @@
-import type State from "../modals/State";
+import type State from "../../modals/State";
 
 import { browser } from "$app/env";
-import { encode_cmd } from "../util/cmd";
+import { encode_cmd } from "../../util/cmd";
+import { handle } from "./commands";
 
 const reopenTimeouts = [2000, 5000, 10000, 30000, 60000];
 
@@ -81,11 +82,14 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
 
     socket = new WebSocket(url, socketOptions);
 
-    socket.onmessage = event => {
+    socket.onmessage = async event => {
       try {
-        initialValue = JSON.parse(event.data);
+        console.log(atob(await event.data.text()));
+        const command = JSON.parse(atob(await event.data.text()));
+        handle(command, initialValue);
         subscriptions.forEach(subscription => subscription(initialValue));
       } catch (e) {
+        console.error(e);
         console.error(`Unknown message: '${event.data}'`);
       }
     };
