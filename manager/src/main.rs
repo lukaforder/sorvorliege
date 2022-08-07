@@ -15,6 +15,7 @@ mod commands;
 mod server;
 mod messaging;
 mod communicator;
+mod schema;
 
 extern crate strum;
 
@@ -38,6 +39,9 @@ fn load_key(path: &str) -> Result<PrivateKey> {
 #[tokio::main]
 async fn main() -> io::Result<()> {
 	env_logger::init();
+
+	// FIXME: move this to subcommand or seperate binary
+	schema::generate_schemas()?;
 
 	let certs = load_certs("ssl/sorverlord.dev+3.pem").unwrap();
 	let key = load_key("ssl/sorverlord.dev+3-key.pem").unwrap();

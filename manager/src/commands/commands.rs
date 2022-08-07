@@ -1,3 +1,4 @@
+use schemars::JsonSchema;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
@@ -5,12 +6,12 @@ use crate::communicator::CommunicatorType;
 
 #[non_exhaustive]
 #[derive(Debug)]
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 #[serde(tag="type", content="body")]
-pub enum Incoming {
+pub enum ClientCommands {
   CreateServer,
   UpdateServer {
-    id: Uuid,
+    id: String,
     name: Option<String>,
     communicator_type: Option<CommunicatorType>,
   },
@@ -18,8 +19,8 @@ pub enum Incoming {
 
 #[non_exhaustive]
 #[derive(Debug)]
-#[derive(Serialize)]
+#[derive(Serialize, JsonSchema)]
 #[serde(tag="type", content="body")]
-pub enum Outgoing {
-
+pub enum ServerCommands {
+  Identity,
 }

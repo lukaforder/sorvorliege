@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use schemars::JsonSchema;
 use serde::{Serialize, Deserialize};
 use strum_macros::EnumVariantNames;
 use thiserror::Error;
@@ -35,7 +36,7 @@ pub trait Communicator {
 use super::Test;
 
 #[derive(Debug)]
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 #[derive(Clone, Copy)]
 #[derive(EnumVariantNames)]
 #[strum(serialize_all = "PascalCase")]

@@ -24,6 +24,8 @@ serde_json = { version = "1.0", features = ["preserve_order"] }
 strum = "0.24.1"
 strum_macros = "0.24"
 
+schemars = "0.8.10"
+
 tokio = { version = "1.19.2", features = ["full"] }
 
 rustls-pemfile = "1.0.0"

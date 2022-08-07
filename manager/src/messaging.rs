@@ -9,7 +9,7 @@ use tokio_tungstenite::{accept_async, WebSocketStream};
 
 use crate::commands;
 
-fn encode_cmd(cmd: &commands::Outgoing) -> Vec<u8> {
+fn encode_cmd(cmd: &commands::ServerCommands) -> Vec<u8> {
   Vec::from(
     base64::encode(
       urlencoding::encode(
