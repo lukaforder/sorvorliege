@@ -1,8 +1,14 @@
 import type State from "../modals/State";
 
 import { browser } from "$app/env";
+import { encode_cmd } from "../util/cmd";
 
 const reopenTimeouts = [2000, 5000, 10000, 30000, 60000];
+
+export interface WSStore<T> extends SvelteStore<T> {
+  set(value: State): void,
+  increment(amount: number): void,
+}
 
 /**
  * Create a writable store based on a web-socket.
@@ -14,7 +20,7 @@ const reopenTimeouts = [2000, 5000, 10000, 30000, 60000];
  * @return {Store}
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function wsStore(url: string, initialValue: State, socketOptions: string[] = []): SvelteStore<State> {
+export function wsStore(url: string, initialValue: State, socketOptions: string[] = []): WSStore<State> {
 
   if (!browser) {
     console.log('not browser');
@@ -24,6 +30,8 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return () => {};
       },
+      set(value: State) {console.error("not browser");return;},
+      increment(amount: number) {console.error("not browser");return;},
     };
   }
 
@@ -100,12 +108,12 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
   }
 
   return {
-    // set(value) {
-    //   if(!socket) return;
-    //   const send = () => socket.send(JSON.stringify(value));
-    //   if (socket.readyState !== WebSocket.OPEN) open().then(send);
-    //   else send();
-    // },
+    set(value: State) {
+      if(!socket) return;
+      const send = () => socket?.send(JSON.stringify(value));
+      if (socket.readyState !== WebSocket.OPEN) open().then(send);
+      else send();
+    },
     subscribe(subscription: (value: State) => void) {
       open();
       subscription(initialValue);
@@ -116,7 +124,13 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
           close();
         }
       };
-    }
+    },
+    increment(amount: number) {
+      if(!socket) return console.error('socket is null');
+      const send = () => socket?.send(encode_cmd({type: 'Increment', body: amount}));
+      if (socket.readyState !== WebSocket.OPEN) open().then(send);
+      else send();
+    },
   };
 }
 

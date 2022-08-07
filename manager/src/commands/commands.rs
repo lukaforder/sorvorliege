@@ -15,6 +15,8 @@ pub enum ClientCommands {
     name: Option<String>,
     communicator_type: Option<CommunicatorType>,
   },
+  /// Request to increment the server's counter by a certain amount.
+  Increment(u32),
 }
 
 #[non_exhaustive]
@@ -23,4 +25,6 @@ pub enum ClientCommands {
 #[serde(tag="type", content="body")]
 pub enum ServerCommands {
   Identity,
+  /// Tell the client the value of the test counter.
+  Counter(u32),
 }

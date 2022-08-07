@@ -5,6 +5,12 @@
     isConnected: false,
     testVar: 0
   }, []);
+
+  let inc = 1;
 </script>
 
-<p> {$ws} </p>
+<p> {JSON.stringify($ws)} </p>
+<input type="number" bind:value={inc} min=0 />
+<button on:click={() => {
+  ws.increment(inc);
+}}>Increment</button>

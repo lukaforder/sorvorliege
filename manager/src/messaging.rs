@@ -7,7 +7,7 @@ use tokio::net::TcpStream;
 use tokio_rustls::server::TlsStream;
 use tokio_tungstenite::{accept_async, WebSocketStream};
 
-use crate::commands;
+use crate::commands::{self, ClientCommands};
 
 fn encode_cmd(cmd: &commands::ServerCommands) -> Vec<u8> {
   Vec::from(
@@ -19,8 +19,25 @@ fn encode_cmd(cmd: &commands::ServerCommands) -> Vec<u8> {
   )
 }
 
-async fn process_message(msg: tungstenite::Message) -> tungstenite::Result<()> {
+fn decode_cmd<S: AsRef<str>>(txt: S) -> Option<ClientCommands> {
+  let txt = txt.as_ref();
+  let txt = base64::decode(txt).unwrap();
+  let txt = String::from_utf8(txt).unwrap();
+  serde_json::from_str(&txt).ok()
+} 
 
+async fn process_message(msg: tungstenite::Message) -> tungstenite::Result<()> {
+  match msg {
+    tungstenite::Message::Text(text) => {
+      let cmd = decode_cmd(text);
+      info!("{:?}", cmd);
+    },
+    tungstenite::Message::Binary(bin) => {info!("WS BIN: {} bytes", bin.len());},
+    tungstenite::Message::Ping(_) => {},
+    tungstenite::Message::Pong(_) => {},
+    tungstenite::Message::Close(_) => {},
+    tungstenite::Message::Frame(_) => {},
+}
   Ok(())
 }
 
