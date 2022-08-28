@@ -25,7 +25,7 @@ pub enum ClientCommands {
 #[serde(tag="type", content="body")]
 pub enum ServerCommands {
   Identity,
-  ServerInfo(ServerInfo),
+  ServerInfo(Vec<ServerInfo>),
   /// Tell the client the value of the test counter.
   Counter(u32),
 }

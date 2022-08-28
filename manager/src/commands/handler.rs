@@ -12,14 +12,15 @@ pub async fn handle_command(cmd: ClientCommands, state: Arc<State>) -> Vec<tungs
   match cmd {
     ClientCommands::CreateServer => {
       let server = Server::new();
-      send_command!(tx, &ServerCommands::ServerInfo(server.info().clone()));
+      send_command!(tx, &ServerCommands::ServerInfo(vec![server.info().clone()]));
       state.servers.lock().await.push(server);
     },
     ClientCommands::UpdateServer { id, name, communicator_type } => {
       let mut servers = state.servers.lock().await;
-      let server = servers.iter_mut().find(|s| s.id() == &id).unwrap();
-      server.update(name, communicator_type);
-      send_command!(tx, &ServerCommands::ServerInfo(server.info().clone()));
+      if let Some(server) = servers.iter_mut().find(|s| s.id() == &id) {
+        server.update(name, communicator_type);
+        send_command!(tx, &ServerCommands::ServerInfo(vec![server.info().clone()]));
+      }
     },
     ClientCommands::Increment(amount) => {
       state.counter.fetch_add(amount, Ordering::SeqCst);

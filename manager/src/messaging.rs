@@ -1,6 +1,6 @@
 use std::{net::SocketAddr, sync::Arc};
 
-use futures::{pin_mut, StreamExt, TryStreamExt};
+use futures::{pin_mut, StreamExt, TryStreamExt, SinkExt};
 use futures_channel::mpsc::{unbounded, UnboundedSender};
 use log::{info, error};
 use tokio::{net::TcpStream, sync::Mutex};
@@ -58,16 +58,23 @@ pub async fn handle_connection(peer: SocketAddr, stream: TlsStream<TcpStream>, s
 
   let (ws_out, ws_in) = ws_stream.split();
   // channel to receive messages we want to send to the client
-  let (tx, rx) = unbounded();
+  let (mut tx, rx) = unbounded();
 
   // forward all messages from channel to the client
   let pipe_to_client = rx.map(Ok).forward(ws_out);
   pin_mut!(pipe_to_client);
 
+  { // TODO: move this when auth is impl'd
+    let servers = state.servers.lock().await;
+    tx.send(tungstenite::Message::from(crate::messaging::encode_cmd(&commands::ServerCommands::ServerInfo(
+      servers.iter().map(|s| s.info().clone()).collect()
+    )))).await.unwrap();
+  }
+
   let tx = Arc::new(Mutex::new(tx));
   // process all incoming messages from the client
   let process_incoming = ws_in.try_for_each(|msg| process_message(msg, state.clone(), tx.clone()));
-
+  
   // poll and wait for both simultaneously
   let (res1, res2) = futures::join!(pipe_to_client, process_incoming);
   res1.unwrap();
