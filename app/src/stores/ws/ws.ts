@@ -3,12 +3,14 @@ import type State from "../../modals/State";
 import { browser } from "$app/env";
 import { encode_cmd } from "../../util/cmd";
 import { handle } from "./commands";
+import type { ClientCommands } from "src/modals/api_types";
 
 const reopenTimeouts = [2000, 5000, 10000, 30000, 60000];
 
 export interface WSStore<T> extends SvelteStore<T> {
   set(value: State): void,
   increment(amount: number): void,
+  send(command: ClientCommands): void,
 }
 
 /**
@@ -31,8 +33,9 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return () => {};
       },
-      set(value: State) {console.error("not browser");return;},
-      increment(amount: number) {console.error("not browser");return;},
+      set(_value: State) {console.error("not browser");return;},
+      increment(_amount: number) {console.error("not browser");return;},
+      send(_command: ClientCommands) {console.error("not browser");return;},
     };
   }
 
@@ -81,6 +84,7 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
     }
 
     socket = new WebSocket(url, socketOptions);
+    console.log('opening websocket', url);
 
     socket.onmessage = async event => {
       try {
@@ -135,6 +139,12 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
       if (socket.readyState !== WebSocket.OPEN) open().then(send);
       else send();
     },
+    send(command: ClientCommands) {
+      if(!socket) return console.error('socket is null');
+      const send = () => socket?.send(encode_cmd(command));
+      if (socket.readyState !== WebSocket.OPEN) open().then(send);
+      else send();
+    }
   };
 }
 

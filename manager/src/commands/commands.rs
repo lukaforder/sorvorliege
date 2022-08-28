@@ -2,7 +2,7 @@ use schemars::JsonSchema;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
-use crate::communicator::CommunicatorType;
+use crate::{communicator::CommunicatorType, server::ServerInfo};
 
 #[non_exhaustive]
 #[derive(Debug)]
@@ -25,6 +25,7 @@ pub enum ClientCommands {
 #[serde(tag="type", content="body")]
 pub enum ServerCommands {
   Identity,
+  ServerInfo(ServerInfo),
   /// Tell the client the value of the test counter.
   Counter(u32),
 }
