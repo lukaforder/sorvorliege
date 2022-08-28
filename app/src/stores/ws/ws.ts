@@ -1,6 +1,6 @@
 import type State from "../../modals/State";
 
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import { encode_cmd } from "../../util/cmd";
 import { handle } from "./commands";
 import type { ClientCommands } from "src/modals/api_types";
