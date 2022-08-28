@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { ServerInfo } from "src/modals/api_types";
+  import { CommunicatorType, type ServerInfo } from "../../modals/api_types";
+
   import type State from "src/modals/State";
   import type { WSStore } from "src/stores/ws";
   import { getContext } from "svelte";
@@ -46,7 +47,12 @@
     <button>Delete</button>
   </header>
   <section>
-
+    <label for="comm_type">Communicator Type</label>
+    <select name="comm_type">
+      {#each Object.keys(CommunicatorType) as c}
+        <option value="{c}">{c}</option>
+      {/each}
+    </select>
   </section>
 </article>
 

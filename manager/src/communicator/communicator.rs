@@ -1,6 +1,10 @@
+use std::collections::BTreeMap;
+
 use async_trait::async_trait;
-use schemars::JsonSchema;
+use schemars::{JsonSchema, schema::{SchemaObject, InstanceType}};
 use serde::{Serialize, Deserialize};
+use serde_json::json;
+use strum::VariantNames;
 use strum_macros::EnumVariantNames;
 use thiserror::Error;
 
@@ -37,7 +41,7 @@ pub trait Communicator {
 use super::Test;
 
 #[derive(Debug)]
-#[derive(Serialize, Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize)]
 #[derive(Clone, Copy)]
 #[derive(EnumVariantNames)]
 #[strum(serialize_all = "PascalCase")]
@@ -45,6 +49,23 @@ pub enum CommunicatorType {
   None,
   #[strum(serialize="Test")]
   Test
+}
+
+impl JsonSchema for CommunicatorType {
+  fn schema_name() -> String {
+    "CommunicatorType".to_string()
+  }
+
+  fn json_schema(gen: &mut schemars::gen::SchemaGenerator) -> schemars::schema::Schema {
+    let mut extensions = BTreeMap::new();
+    extensions.insert("tsEnumNames".to_string(), json!(CommunicatorType::VARIANTS));
+    SchemaObject {
+      instance_type: Some(InstanceType::String.into()),
+      enum_values: Some(CommunicatorType::VARIANTS.to_vec().iter().map(|v| json!(v)).collect()),
+      extensions,
+      ..Default::default()
+    }.into()
+  }
 }
 
 pub fn generate_communicator(comm_type: &CommunicatorType) -> Option<BoxedCommunicator> {

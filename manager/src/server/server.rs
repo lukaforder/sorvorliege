@@ -56,7 +56,6 @@ impl Server {
     }
   }
 
-
   pub fn id(&self) -> &ID {
     &self.id
   }

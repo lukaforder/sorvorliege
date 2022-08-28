@@ -15,7 +15,7 @@ async function main() {
     let file_path = path.join(schemas_path,file);
     let schema = JSON.parse(await fs.readFile(file_path));
     console.log(`Processing ${file}`);
-    let compiled = await compile(schema, schema.title, {bannerComment: ''});
+    let compiled = await compile(schema, schema.title, {bannerComment: '', enableConstEnums: false});
 
     let each_type = compiled.split('export');
     for (let type of each_type) {
