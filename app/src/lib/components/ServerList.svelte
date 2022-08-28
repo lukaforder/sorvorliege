@@ -67,6 +67,9 @@
         opacity: 1;
         text-align: left;
         font-size: 1rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       h2 {
