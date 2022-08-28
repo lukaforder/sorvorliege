@@ -18,13 +18,17 @@ pub async fn handle_command(cmd: ClientCommands, state: Arc<State>) -> Vec<tungs
     ClientCommands::UpdateServer { id, name, communicator_type } => {
       let mut servers = state.servers.lock().await;
       if let Some(server) = servers.iter_mut().find(|s| s.id() == &id) {
-        server.update(name, communicator_type);
+        // FIXME: user association
+        server.update(String::new(), name, communicator_type);
         send_command!(tx, &ServerCommands::ServerInfo(vec![server.info().clone()]));
       }
     },
-    ClientCommands::Increment(amount) => {
-      state.counter.fetch_add(amount, Ordering::SeqCst);
-      send_command!(tx, &ServerCommands::Counter(state.counter.load(Ordering::SeqCst)));
+    ClientCommands::GetLogs { id, page } => {
+      let mut servers = state.servers.lock().await;
+      if let Some(server) = servers.iter_mut().find(|s| s.id() == &id) {
+        let (page, messages) = server.get_logs(page);
+        send_command!(tx, &ServerCommands::ServerLogs { page, messages: messages.to_vec() });
+      }
     },
   };
 }

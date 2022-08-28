@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, fmt::Write};
 
 use schemars::JsonSchema;
 use serde::{Serialize, Deserialize};
@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 use crate::{communicator::{CommunicatorType, BoxedCommunicator, self}, state::ID};
 
-use super::Message;
+use super::{Message, MessageType};
 
 
 // FIXME: make this configurable?
@@ -64,11 +64,28 @@ impl Server {
     &self.info
   }
 
-  pub fn update(&mut self, name: Option<String>, comm_type: Option<CommunicatorType>) {
+  pub fn get_logs(&self, page: Option<usize>) -> (usize, &[Message]) {
+    let page = page.unwrap_or(self.messages.len() / PAGE_SIZE);
+    (page, &self.messages[page * PAGE_SIZE..(page + 1) * PAGE_SIZE])
+  }
+
+  pub fn update(&mut self, user: String, name: Option<String>, comm_type: Option<CommunicatorType>) {
+    let mut msg = "changed ".to_string();
     if let Some(name) = name{
+      msg.write_fmt(format_args!("name to '{}' and ", &name)).unwrap();
       self.info.name = name;
     }
-    self.info.comm_type = comm_type.unwrap_or(self.info.comm_type);
+    if let Some(comm_type) = comm_type {
+      self.info.comm_type = comm_type;
+      msg.write_fmt(format_args!("communicator type to '{:?}' and ", comm_type)).unwrap();
+    }
+    if msg.len() > 8 {
+      self.messages.push(Message::new(
+        user,
+        msg[..msg.len() - 5].to_string(),
+        MessageType::Out
+      ));
+    }
   }
 
   pub async fn connect(&mut self) -> communicator::Result<()> {
