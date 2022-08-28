@@ -20,7 +20,7 @@
 </svelte:head>
 
 <ServerList bind:selected_server={current_server}/>
-<ServerView />
+<ServerView server={current_server ? $ws.servers[current_server] : null} />
 
 <style lang="scss">
   :global(body) {
