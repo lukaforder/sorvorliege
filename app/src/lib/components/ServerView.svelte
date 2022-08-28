@@ -7,8 +7,6 @@
 
   const ws: WSStore<State> = getContext("ws");
 
-  let dirty = false;
-  let name: string | null = null;
   const change_name = (name: string, el: HTMLInputElement) => {
     console.log("attmept to set name to", name)
     if(name === "") el.value = server?.name ?? "Select a server."; 
