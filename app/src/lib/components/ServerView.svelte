@@ -42,6 +42,19 @@
     target.blur();
     change_name(target.innerText, target);
   }
+
+  const on_comm_change = (e: Event) => {
+    if(!server) return;
+    const target = e.target as HTMLSelectElement;
+    console.log("setting comm type to", target.value);
+    ws.send({
+      type: "UpdateServer",
+      body: {
+        id: server.id,
+        communicator_type: target.value as CommunicatorType,
+      }
+    })
+  }
 </script>
 
 <article class:noserver="{server === null}">
@@ -67,8 +80,8 @@
   <section>
     <ul>
       <li>
-        <label for="comm_type">Communicator Type</label>
-        <select name="comm_type" on:change="{()=>{}}">
+        <label for="comm_type">Communicator Type {server?.comm_type}</label>
+        <select name="comm_type" on:change="{on_comm_change}" value={server?.comm_type}>
           {#each Object.keys(CommunicatorType) as c}
             <option value="{c}">{c}</option>
           {/each}
