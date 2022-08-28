@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ServerView from "../lib/components/ServerView.svelte";
   import { setContext } from "svelte";
 
   import ServerList from "../lib/components/ServerList.svelte";
@@ -19,3 +20,11 @@
 </svelte:head>
 
 <ServerList bind:selected_server={current_server}/>
+<ServerView />
+
+<style lang="scss">
+  :global(body) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+</style>
