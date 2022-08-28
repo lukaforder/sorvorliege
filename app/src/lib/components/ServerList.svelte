@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type State from "src/modals/State";
-  import type { WSStore } from "src/stores/ws";
+  import type State from "$lib/modals/State";
+  import type { WSStore } from "$lib/stores/ws";
   import { createEventDispatcher, getContext } from "svelte";
 
   export let selected_server: string | null = null;

@@ -1,5 +1,5 @@
-import type { ServerCommands } from "src/modals/api_types";
-import type State from "src/modals/State";
+import type { ServerCommands } from "$lib/modals/api_types";
+import type State from "$lib/modals/State";
 
 export const handle = (cmd: ServerCommands, state: State) => {
   switch (cmd.type) {

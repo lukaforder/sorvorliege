@@ -3,7 +3,7 @@
   import { setContext } from "svelte";
 
   import ServerList from "../lib/components/ServerList.svelte";
-  import {wsStore} from "../stores/ws/ws";
+  import {wsStore} from "../lib/stores/ws/ws";
 
   export const ws = wsStore("wss://localhost:18249", {
     isConnected: false,

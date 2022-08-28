@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { CommunicatorType, type ServerInfo } from "../../modals/api_types";
+  import { CommunicatorType, type ServerInfo } from "../modals/api_types";
 
-  import type State from "src/modals/State";
-  import type { WSStore } from "src/stores/ws";
+  import type State from "$lib/modals/State";
+  import type { WSStore } from "$lib/stores/ws";
   import { getContext } from "svelte";
   export let server: ServerInfo | null = null;
 

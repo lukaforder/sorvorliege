@@ -3,13 +3,12 @@ import type State from "../../modals/State";
 import { browser } from "$app/environment";
 import { encode_cmd } from "../../util/cmd";
 import { handle } from "./commands";
-import type { ClientCommands } from "src/modals/api_types";
+import type { ClientCommands } from "$lib/modals/api_types";
+import { get_socket, type SharedSocket } from "$lib/websocket";
 
 const reopenTimeouts = [2000, 5000, 10000, 30000, 60000];
 
 export interface WSStore<T> extends SvelteStore<T> {
-  set(value: State): void,
-  increment(amount: number): void,
   send(command: ClientCommands): void,
 }
 
@@ -24,22 +23,19 @@ export interface WSStore<T> extends SvelteStore<T> {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function wsStore(url: string, initialValue: State, socketOptions: string[] = []): WSStore<State> {
-
   if (!browser) {
-    console.log('not browser');
     return {
       subscribe(subscription: (value: State) => void) {
         subscription(initialValue);
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return () => {};
       },
-      set(_value: State) {console.error("not browser");return;},
-      increment(_amount: number) {console.error("not browser");return;},
       send(_command: ClientCommands) {console.error("not browser");return;},
     };
   }
 
-  let socket: WebSocket | null;
+  const [id, socket] = get_socket(url, socketOptions);
+
   let openPromise: Promise<void> | null;
   let reopenTimeoutHandler: NodeJS.Timeout | null;
 
@@ -59,10 +55,7 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
       clearTimeout(reopenTimeoutHandler);
     }
 
-    if (socket) {
-      socket.close();
-      socket = null;
-    }
+    socket.close(id);
   }
 
   function reopen() {
@@ -83,45 +76,31 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
       return openPromise;
     }
 
-    socket = new WebSocket(url, socketOptions);
-    console.log('opening websocket', url);
+    socket.open(id);
 
-    socket.onmessage = async event => {
-      try {
-        console.log(atob(await event.data.text()));
-        const command = JSON.parse(atob(await event.data.text()));
-        handle(command, initialValue);
-        subscriptions.forEach(subscription => subscription(initialValue));
-      } catch (e) {
-        console.error(e);
-        console.error(`Unknown message: '${event.data}'`);
-      }
-    };
+    socket.onmessage(id, async event => {
+      handle(event, initialValue);
+      subscriptions.forEach(subscription => subscription(initialValue));
+    });
 
-    socket.onclose = () => reopen();
+    socket.onclose(id, () => reopen());
 
     openPromise = new Promise((resolve, reject) => {
       if(!socket) return reject(new Error('socket is null'));
-      socket.onerror = error => {
+      socket.onerror(id, error => {
         reject(error);
         openPromise = null;
-      };
-      socket.onopen = () => {
+      });
+      socket.onopen(id, () => {
         reopenCount = 0;
         resolve();
         openPromise = null;
-      };
+      });
     });
     return openPromise;
   }
 
   return {
-    set(value: State) {
-      if(!socket) return;
-      const send = () => socket?.send(JSON.stringify(value));
-      if (socket.readyState !== WebSocket.OPEN) open().then(send);
-      else send();
-    },
     subscribe(subscription: (value: State) => void) {
       open();
       subscription(initialValue);
@@ -133,17 +112,8 @@ export function wsStore(url: string, initialValue: State, socketOptions: string[
         }
       };
     },
-    increment(amount: number) {
-      if(!socket) return console.error('socket is null');
-      const send = () => socket?.send(encode_cmd({type: 'Increment', body: amount}));
-      if (socket.readyState !== WebSocket.OPEN) open().then(send);
-      else send();
-    },
     send(command: ClientCommands) {
-      if(!socket) return console.error('socket is null');
-      const send = () => socket?.send(encode_cmd(command));
-      if (socket.readyState !== WebSocket.OPEN) open().then(send);
-      else send();
+      socket.send(id, command);
     }
   };
 }
