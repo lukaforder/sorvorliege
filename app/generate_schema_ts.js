@@ -25,7 +25,7 @@ async function main() {
   }
 
   let output = Array.from(types).join('\n\n');
-  let output_path = path.join(dirname,'src','modals','api_types.ts');
+  let output_path = path.join(dirname,'src','lib','modals','api_types.ts');
 
   try {
     let existing = await fs.readFile(output_path);
