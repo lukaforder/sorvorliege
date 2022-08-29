@@ -1,3 +1,4 @@
+use env_logger::Env;
 use log::*;
 
 use rustls_pemfile::certs;
@@ -39,7 +40,7 @@ fn load_key(path: &str) -> Result<PrivateKey> {
 
 #[tokio::main]
 async fn main() -> io::Result<()> {
-	env_logger::init();
+  env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
 	// FIXME: move this to subcommand or seperate binary
 	schema::generate_schemas()?;
