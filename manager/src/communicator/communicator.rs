@@ -7,6 +7,7 @@ use serde_json::json;
 use strum::VariantNames;
 use strum_macros::EnumVariantNames;
 use thiserror::Error;
+use uuid::Uuid;
 
 
 #[derive(Error, Debug)]
@@ -29,7 +30,7 @@ pub trait Communicator {
   async fn disconnect(&mut self) -> Result<()>;
 
   fn name(&self) -> &'static str;
-  fn id(&self) -> String;
+  fn id(&self) -> Uuid;
 }
 
 /* TODO: find a better alternative to hardcoding CommunicatorType

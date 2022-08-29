@@ -41,9 +41,9 @@ pub struct Server {
 
 impl Server {
   pub fn new() -> Self {
-    let id = Uuid::new_v4().to_string();
+    let id = Uuid::new_v4();
     let info = ServerInfo {
-      id: id.clone(),
+      id,
       name: "new server".to_string(),
       comm_status: CommunicatorStatus::Disconnected,
       comm_type: CommunicatorType::None,

@@ -1,18 +1,19 @@
 use async_trait::async_trait;
 use serde::Serialize;
+use uuid::Uuid;
 
 use super::Communicator;
 use super::Result;
 
 #[derive(Serialize)]
 pub struct Test {
-  id: String,
+  id: Uuid,
 }
 
 impl Test {
   pub fn new() -> Self {
     Self {
-      id: uuid::Uuid::new_v4().to_string(),
+      id: uuid::Uuid::new_v4(),
     }
   }
 }
@@ -31,7 +32,7 @@ impl Communicator for Test {
   fn name(&self) -> &'static str {
     "Test"
   }
-  fn id(&self) -> String {
+  fn id(&self) -> Uuid {
     self.id.clone()
   }
 }

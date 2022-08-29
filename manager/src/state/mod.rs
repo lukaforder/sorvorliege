@@ -3,6 +3,7 @@ use std::sync::{atomic::AtomicU32, Arc};
 use schemars::JsonSchema;
 use serde::{Serialize, Deserialize};
 use tokio::sync::Mutex;
+use uuid::Uuid;
 
 use crate::server::{Server, ServerInfo};
 
@@ -21,7 +22,7 @@ use crate::server::{Server, ServerInfo};
 //   id: String,
 // }
 
-pub type ID = String;
+pub type ID = Uuid;
 
 #[derive(Debug)]
 #[derive(Serialize, Deserialize, JsonSchema)]

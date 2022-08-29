@@ -1,7 +1,7 @@
 use std::{path::Path, io};
 
 use log::info;
-use schemars::{schema_for, schema::RootSchema};
+use schemars::{schema_for, schema::RootSchema, JsonSchema};
 
 fn write_schema(dir: &Path, name: &str, schema: &RootSchema) -> io::Result<()> {
   let output = serde_json::to_string_pretty(schema).unwrap();

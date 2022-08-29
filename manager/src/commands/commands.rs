@@ -6,20 +6,20 @@ use crate::{communicator::CommunicatorType, server::{ServerInfo, Message}};
 
 #[non_exhaustive]
 #[derive(Debug)]
-#[derive(Deserialize, JsonSchema)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 #[serde(tag="type", content="body")]
 pub enum ClientCommands {
   /// Create a new server.
   CreateServer,
   /// Update server information.
   UpdateServer {
-    id: String,
+    id: Uuid,
     name: Option<String>,
     communicator_type: Option<CommunicatorType>,
   },
   /// Request server logs.
   GetLogs {
-    id: String,
+    id: Uuid,
     /// If not specified, will return the most recent page.
     page: Option<usize>,
   },

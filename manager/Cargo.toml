@@ -15,7 +15,7 @@ base64 = "0.13.0"
 urlencoding = "2.1.0"
 
 chrono = "0.4.19"
-uuid = { version = "1.1.2", features = ["v4", "serde"] } # uuid's fit well in this context.
+uuid = { version = "1.1.2", features = ["v4", "serde"] }
 
 async-trait = "0.1.56"
 anyhow = "1.0.58"
@@ -26,7 +26,7 @@ serde_json = { version = "1.0", features = ["preserve_order"] }
 strum = "0.24.1"
 strum_macros = "0.24"
 
-schemars = "0.8.10"
+schemars = { version = "0.8.10", features = ["uuid1"] }
 
 tokio = { version = "1.19.2", features = ["full"] }
 
