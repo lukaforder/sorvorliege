@@ -66,7 +66,9 @@ impl Server {
 
   pub fn get_logs(&self, page: Option<usize>) -> (usize, &[Message]) {
     let page = page.unwrap_or(self.messages.len() / PAGE_SIZE);
-    (page, &self.messages[page * PAGE_SIZE..(page + 1) * PAGE_SIZE])
+    let from = page * PAGE_SIZE.clamp(0, self.messages.len());
+    let to = (from + PAGE_SIZE).clamp(0, self.messages.len());
+    (page, &self.messages[from..to])
   }
 
   pub fn update(&mut self, user: String, name: Option<String>, comm_type: Option<CommunicatorType>) {
