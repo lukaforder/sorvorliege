@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ServerInfo } from "$lib/modals/api_types";
   import logStore from "$lib/stores/log";
+import { time_ranges_to_array } from "svelte/internal";
 
   let old_server: ServerInfo | null = null;
   export let server: ServerInfo | null = null;
@@ -34,6 +35,10 @@
     const d = new Date(ts*1000);
     return `${d.getHours()}:${d.getMinutes()}`;
   };
+  const format_ts_full = (ts: number) => {
+    const d = new Date(ts*1000);
+    return d.toLocaleString();
+  }
 </script>
 
 <article bind:this={list}>
@@ -41,7 +46,7 @@
     {#each $logs.pages as page}
       {#each page as msg}
         <li class="{msg.msg_type}">
-          <span class="timestamp">{format_ts(msg.timestamp)}</span>
+          <span class="timestamp" title="{format_ts_full(msg.timestamp)}">{format_ts(msg.timestamp)}</span>
           <span class="body">{msg.body}</span>
         </li>
       {/each}  
