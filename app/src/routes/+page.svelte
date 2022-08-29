@@ -45,6 +45,10 @@ import ServerLogs from "$lib/components/ServerLogs.svelte";
     padding: 0;
   }
 
+  section {
+    padding: 0.5em;
+  }
+
   .list {
     grid-area: list;
   }
