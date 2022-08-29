@@ -80,7 +80,7 @@
   <section>
     <ul>
       <li>
-        <label for="comm_type">Communicator Type {server?.comm_type}</label>
+        <label for="comm_type">Communicator Type</label>
         <select name="comm_type" on:change="{on_comm_change}" value={server?.comm_type}>
           {#each Object.keys(CommunicatorType) as c}
             <option value="{c}">{c}</option>
