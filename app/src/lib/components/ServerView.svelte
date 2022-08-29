@@ -211,8 +211,10 @@
 
       select, input {
         @include minimal-input;
+        box-sizing: content-box;
         height: 1.25em;
         font-size: 1rem;
+        line-height: 1rem;
       }
 
       select {

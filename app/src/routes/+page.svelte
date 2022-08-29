@@ -4,6 +4,7 @@
 
   import ServerList from "../lib/components/ServerList.svelte";
   import {wsStore} from "../lib/stores/ws/ws";
+import ServerLogs from "$lib/components/ServerLogs.svelte";
 
   export const ws = wsStore("wss://localhost:18249", {
     isConnected: false,
@@ -21,6 +22,7 @@
 
 <ServerList bind:selected_server={current_server}/>
 <ServerView server={current_server ? $ws.servers[current_server] : null} />
+<ServerLogs server={current_server ? $ws.servers[current_server] : null} />
 
 <style lang="scss">
   :global(body) {
