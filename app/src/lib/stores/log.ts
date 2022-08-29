@@ -27,14 +27,17 @@ export function logStore(url: string, initialValue: Logs, socketOptions: string[
     socket.open(id);
 
     socket.onmessage(id, async cmd => {
+      let dirty = false;
       switch (cmd.type) {
         case "ServerLogs":
+          dirty = true;
           initialValue.pages[cmd.body.page] = cmd.body.messages;
         break;
         default:
           break;
       }
-      subscriptions.forEach(subscription => subscription(initialValue));
+      if(dirty)
+        subscriptions.forEach(subscription => subscription(initialValue));
     });
   }
 

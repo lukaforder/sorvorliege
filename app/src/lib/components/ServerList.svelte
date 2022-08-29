@@ -6,6 +6,7 @@
   export let selected_server: string | null = null;
   const ws: WSStore<State> = getContext("ws");
 
+
   const create_server = () => {
     ws?.send({
       type: "CreateServer",

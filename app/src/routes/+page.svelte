@@ -20,13 +20,38 @@ import ServerLogs from "$lib/components/ServerLogs.svelte";
   <link rel="stylesheet" href="/style/dark.css">
 </svelte:head>
 
-<ServerList bind:selected_server={current_server}/>
-<ServerView server={current_server ? $ws.servers[current_server] : null} />
-<ServerLogs server={current_server ? $ws.servers[current_server] : null} />
+<section class="list">
+  <ServerList bind:selected_server={current_server}/>
+</section>
+<section class="view">
+  <ServerView server={current_server ? $ws.servers[current_server] : null} />
+</section>
+<section class="logs">
+  <ServerLogs server={current_server ? $ws.servers[current_server] : null} />
+</section>
 
 <style lang="scss">
   :global(body) {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 50vw 50vw;
+    grid-template-rows: 50vh 50vh;
+    grid-template-areas: "list view" "list logs";
+
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
+  }
+
+  .list {
+    grid-area: list;
+  }
+  .view {
+    grid-area: view;
+  }
+  .logs {
+    grid-area: logs;
   }
 </style>
