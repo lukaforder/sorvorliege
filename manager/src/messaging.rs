@@ -2,7 +2,7 @@ use std::{net::SocketAddr, sync::Arc};
 
 use futures::{pin_mut, StreamExt, TryStreamExt, SinkExt};
 use futures_channel::mpsc::{unbounded, UnboundedSender};
-use log::{info, error};
+use log::{info, error, debug};
 use tokio::{net::TcpStream, sync::Mutex};
 use tokio_rustls::server::TlsStream;
 use tokio_tungstenite::{accept_async, WebSocketStream};
@@ -37,7 +37,10 @@ async fn process_message(msg: tungstenite::Message, state: Arc<State>, tx: Arc<C
   match msg {
     tungstenite::Message::Text(text) => {
       let res = match decode_cmd(&text) {
-        Some(cmd) => handler::handle_command(cmd, state).await,
+        Some(cmd) => {
+          debug!("Received command: {:?}", cmd);
+          handler::handle_command(cmd, state).await
+        },
         _ => {error!("Could not decode message: {}", &text); Vec::new()},
       };
       {

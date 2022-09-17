@@ -55,6 +55,25 @@
       }
     })
   }
+
+  const btn_connect = (e: Event) => {
+    console.log("connecting to?");
+    if(!server) return;
+    console.log("connecting to", server.id);
+    switch (server.comm_status) {
+      case "Missing":
+        return;
+      case "Disconnected":
+        ws.send({
+          type: "SetConnected",
+          body: {
+            id: server.id,
+            connected: server.comm_status === "Disconnected",
+          }
+        })
+      break;
+    }
+  }
 </script>
 
 <article class:noserver="{server === null}">
@@ -71,8 +90,10 @@
     {:else}
       <h1>Select a server.</h1>
     {/if}
-    <button>Edit</button>
-    <button>Power</button>
+    <button on:mouseup="{btn_connect}" disabled="{server?.comm_status === "Missing"}">{(
+      server?.comm_status == "Disconnected" ||
+      server?.comm_status == "Missing"
+      ) ? "Connect" : "Disconnect"}</button>
     <button>Open</button>
     <span class="grow"/>
     <button>Delete</button>

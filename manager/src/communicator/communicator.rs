@@ -9,13 +9,15 @@ use strum_macros::EnumVariantNames;
 use thiserror::Error;
 use uuid::Uuid;
 
+use crate::server::CommunicatorStatus;
+
 
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("connection to server lost")]
     ConnectionLost,
     #[error("failed to connect to server")]
-    ConnectionFailed,
+    ConnectionFailed(String),
     #[error("unknown communicator error")]
     Unknown,
   }
@@ -31,6 +33,7 @@ pub trait Communicator {
 
   fn name(&self) -> &'static str;
   fn id(&self) -> Uuid;
+  fn status(&self) -> CommunicatorStatus;
 }
 
 /* TODO: find a better alternative to hardcoding CommunicatorType
@@ -49,6 +52,19 @@ pub enum CommunicatorType {
   Rcon,
 }
 
+impl CommunicatorType {
+  pub fn create(&self) -> Option<BoxedCommunicator> {
+    match self {
+      CommunicatorType::None => {
+        None
+      },
+      CommunicatorType::Rcon => {
+       Some(Box::new(super::Rcon::new()))
+      },
+    }
+  }
+}
+
 impl JsonSchema for CommunicatorType {
   fn schema_name() -> String {
     "CommunicatorType".to_string()
@@ -63,16 +79,5 @@ impl JsonSchema for CommunicatorType {
       extensions,
       ..Default::default()
     }.into()
-  }
-}
-
-pub fn generate_communicator(comm_type: &CommunicatorType) -> Option<BoxedCommunicator> {
-  match comm_type {
-    CommunicatorType::None => {
-      None
-    },
-    CommunicatorType::Rcon => {
-     Some(Box::new(super::Rcon::new()))
-    },
   }
 }

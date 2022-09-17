@@ -17,6 +17,9 @@ pub enum ClientCommands {
     name: Option<String>,
     communicator_type: Option<CommunicatorType>,
   },
+  /// Either connect or disconnect a server.
+  SetConnected{id: Uuid, connected: bool},
+
   /// Request server logs.
   GetLogs {
     id: Uuid,

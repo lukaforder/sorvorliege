@@ -1,5 +1,6 @@
 use std::sync::{Arc, atomic::Ordering};
 
+use log::{error, debug};
 use manager_derive::command;
 use uuid::{uuid, Uuid};
 
@@ -20,7 +21,23 @@ pub async fn handle_command(cmd: ClientCommands, state: Arc<State>) -> Vec<tungs
       if let Some(server) = servers.iter_mut().find(|s| s.id() == &id) {
         // FIXME: user association
         server.update(String::new(), name, communicator_type);
-        send_command!(tx, &ServerCommands::ServerInfo(vec![server.info().clone()]));
+        send_command!(tx, &ServerCommands::ServerInfo(vec![server.info()]));
+      }
+    },
+    ClientCommands::SetConnected { id, connected } => {
+      let mut servers = state.servers.lock().await;
+      debug!("Setting server {} to {}", id, connected);
+      if let Some(server) = servers.iter_mut().find(|s| s.id() == &id) {
+        debug!("found");
+        let result = match connected {
+          true => server.connect().await,
+          false => server.disconnect().await,
+        };
+        if result.is_err() {
+          error!("Failed to set connected: {:?}", result);
+        } else {
+          send_command!(tx, &ServerCommands::ServerInfo(vec![server.info()]));
+        }
       }
     },
     ClientCommands::GetLogs { id, page } => {

@@ -45,7 +45,7 @@ impl Server {
     let info = ServerInfo {
       id,
       name: "new server".to_string(),
-      comm_status: CommunicatorStatus::Disconnected,
+      comm_status: CommunicatorStatus::Missing,
       comm_type: CommunicatorType::None,
     };
     Self {
@@ -60,8 +60,10 @@ impl Server {
     &self.id
   }
 
-  pub fn info(&self) -> &ServerInfo {
-    &self.info
+  pub fn info(&self) -> ServerInfo {
+    let mut info = self.info.clone();
+    info.comm_status = self.communicator.as_ref().map(|c| c.status()).unwrap_or(CommunicatorStatus::Missing);
+    info
   }
 
   pub fn get_logs(&self, page: Option<usize>) -> (usize, &[Message]) {
@@ -78,7 +80,7 @@ impl Server {
       self.info.name = name;
     }
     if let Some(comm_type) = comm_type {
-      self.info.comm_type = comm_type;
+      self.communicator = comm_type.create();
       msg.write_fmt(format_args!("communicator type to '{:?}' and ", comm_type)).unwrap();
     }
     if msg.len() > 8 {
@@ -91,6 +93,14 @@ impl Server {
   }
 
   pub async fn connect(&mut self) -> communicator::Result<()> {
+    if let Some(com) = &mut self.communicator {
+      com.connect().await?;
+      self.messages.push(Message::new(
+        "server".to_string(),
+        "connected".to_string(),
+        MessageType::Out
+      ));
+    }
     Ok(())
   }
   pub async fn disconnect(&mut self) -> communicator::Result<()> {
