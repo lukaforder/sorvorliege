@@ -38,9 +38,6 @@ pub trait Communicator {
   Might be doable with procedural macros but I haven't touched those at all.
  */
 
- 
-use super::Test;
-
 #[derive(Debug)]
 #[derive(Serialize, Deserialize)]
 #[derive(Clone, Copy)]
@@ -48,8 +45,8 @@ use super::Test;
 #[strum(serialize_all = "PascalCase")]
 pub enum CommunicatorType {
   None,
-  #[strum(serialize="Test")]
-  Test
+  #[strum(serialize="Rcon")]
+  Rcon,
 }
 
 impl JsonSchema for CommunicatorType {
@@ -74,8 +71,8 @@ pub fn generate_communicator(comm_type: &CommunicatorType) -> Option<BoxedCommun
     CommunicatorType::None => {
       None
     },
-    CommunicatorType::Test => {
-     Some(Box::new(Test::new()))
+    CommunicatorType::Rcon => {
+     Some(Box::new(super::Rcon::new()))
     },
   }
 }

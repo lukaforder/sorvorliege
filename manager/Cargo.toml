@@ -38,3 +38,5 @@ tungstenite = "0.17.2"
 
 futures = "0.3.21"
 futures-channel = "0.3.21"
+
+rcon = {version = "0", features = ["rt-tokio"]}

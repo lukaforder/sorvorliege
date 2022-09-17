@@ -1,5 +1,5 @@
 mod communicator;
 pub use communicator::*;
 
-mod test;
-pub use test::*;
+mod rcon;
+pub use self::rcon::*;
